@@ -73,6 +73,9 @@ function Navigation() {
           <Link href="/bookProperty" fontSize="md" _hover={{ color: "blue.300" }}>
             Book accomodation
           </Link>
+          <Link href="/profile" fontSize="md" _hover={{ color: "blue.300" }}>
+            Profile
+          </Link>
         </>
       </Stack>
     </Flex>
