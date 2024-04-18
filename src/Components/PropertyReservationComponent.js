@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Web3 from "web3";
-import PropertyReservationABI from "./PropertyReservation.json";
+import PropertyReservationABI from "../Pages/Properties/PropertyReservation.json";
 import {
   Box,
   Button,
@@ -66,7 +66,6 @@ const PropertyReservationComponent = () => {
       </FormControl>
     </Box>
   );
-
 };
 
 export default PropertyReservationComponent;

@@ -16,7 +16,6 @@ import { useNavigate } from "react-router-dom";
 function Navigation() {
   const navigate = useNavigate();
 
-
   const [isNavSticky, setIsNavSticky] = useState(false);
 
   const handleScroll = () => {
@@ -59,7 +58,7 @@ function Navigation() {
       zIndex="1000"
     >
       <Text fontSize="xl" fontWeight="bold">
-        Book accomodation 
+        Book accomodation
       </Text>
 
       <Stack direction="row" spacing={4}>
@@ -67,11 +66,12 @@ function Navigation() {
           Main Page
         </Link>
         <>
-          <Link href="/propertyManage" fontSize="md" _hover={{ color: "blue.300" }}>
-          See accomodations
-          </Link>
-          <Link href="/bookProperty" fontSize="md" _hover={{ color: "blue.300" }}>
-            Book accomodation
+          <Link
+            href="/propertyManage"
+            fontSize="md"
+            _hover={{ color: "blue.300" }}
+          >
+            See accomodations
           </Link>
           <Link href="/profile" fontSize="md" _hover={{ color: "blue.300" }}>
             Profile
