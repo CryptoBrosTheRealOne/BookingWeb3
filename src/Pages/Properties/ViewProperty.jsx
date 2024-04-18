@@ -32,7 +32,7 @@ const ViewProperty = () => {
             setPropertyManagementContract(propertyContract);
             const reservationContract = new web3Instance.eth.Contract(
                 PropertyReservationABI,
-                "0x17c4e63e41afeb6abcbc690421f6644687191259"
+                env.reservationAddress
             );
             setPropertyReservationContract(reservationContract);
             const loadAccounts = async () => {
