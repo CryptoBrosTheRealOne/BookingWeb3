@@ -1,4 +1,4 @@
-import { Box, Divider, Flex, Heading, useToast, Text, Button } from '@chakra-ui/react'
+import { Box, Divider, Flex, Heading, useToast, Text, Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import PropertyManagementABI from "./PropertyManagement.json";
 import { useNavigate, useParams } from 'react-router-dom';
@@ -6,6 +6,8 @@ import Web3 from 'web3';
 import env from '../../env';
 import InteractiveMap from '../../Components/Map/Map';
 import PropertyReservationABI from './PropertyReservation.json';
+
+import BookModal from './BookModal';
 
 const ViewProperty = () => {
     let { id } = useParams();
@@ -19,7 +21,9 @@ const ViewProperty = () => {
     const toast = useToast();
     const navigate = useNavigate();
     const [accounts, setAccounts] = useState([]);
+    const { isOpen, onOpen, onClose } = useDisclosure()
 
+    
     useEffect(() => {
         if (window.ethereum) {
             const web3Instance = new Web3(window.ethereum);
@@ -61,38 +65,52 @@ const ViewProperty = () => {
                 .getProperty(id).call()
             setProperty(x)
             setCoords({ lat: parseFloat(parseInt(x.latitude.toString()) / 100000), lng: parseFloat(parseInt(x.longitude.toString()) / 100000) })
-
+            console.log(x)
         } catch (error) {
             console.error("Error removing property:", error);
         }
     };
 
-    const bookProperty = async () => {
+    const bookProperty = async (startDate, endDate) => {
         if (!propertyReservationContract || accounts.length === 0) {
             console.error("Contract not loaded or no accounts available");
             return;
           }
           try {
             await propertyReservationContract.methods
-              .reserveProperty(id)
+              .reserveProperty(id, startDate, endDate)
               .send({ from: accounts[0] });
-            console.log("Reservation successful");
+            toast({
+                title: "Success",
+                description: "Booked successfully",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+              });
             loadProperty()
+            onClose()
           } catch (error) {
             console.error("Error reserving property:", error);
+            toast({
+                title: "Error",
+                description: "Failed to book property: " + error.message,
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+              });
           }
     }
-
 
     return (
         <Box maxW="800px" mx="auto" p="4">
             <Flex flexDir={"row"} justifyContent={"space-between"}>
                 <Heading mb="4">View - {property.name}</Heading>
-                {property.available ? <Button onClick={bookProperty}>Book</Button> : <Text>Unavailable</Text>}
+                <Button onClick={onOpen}>Book</Button>
             </Flex>
             <Divider mb="4" />
             <Text>{property.description}</Text>
             {coords.lat && <InteractiveMap coords={coords} />}
+            <BookModal isOpen={isOpen} onClose={onClose} bookedPeriods={property.bookedPeriods} bookHandler={bookProperty}></BookModal>
         </Box>
     )
 }

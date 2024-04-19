@@ -102,11 +102,11 @@ const PropertyManagementComponent = () => {
               borderWidth="1px"
               borderRadius="lg"
               p="4"
-              borderColor={property.available ? "green.300" : "red.300"}
+              borderColor={"green.300"}
               boxShadow="0 0 8px rgba(0, 0, 0, 0.1)"
               transition="border-color 0.2s"
               _hover={{
-                borderColor: property.available ? "green.500" : "red.500",
+                borderColor:"green.500",
               }}
             >
               <Heading size="sm" mb="2">
@@ -116,7 +116,6 @@ const PropertyManagementComponent = () => {
               <Box mt="2">
                 <div>Description: {property.description}</div>
                 <div>Price per night: {property.pricePerNight}</div>
-                <div>Available: {property.available ? "Yes" : "No"}</div>
                 <Flex w="50%" justifyContent={"space-between"}>
                   <Button
                     mt="3"

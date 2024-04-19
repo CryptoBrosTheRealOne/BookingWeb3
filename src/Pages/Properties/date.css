@@ -1,0 +1,4 @@
+.react-datepicker__day--highlighted {
+    background-color: red !important;
+    color: white !important;
+}

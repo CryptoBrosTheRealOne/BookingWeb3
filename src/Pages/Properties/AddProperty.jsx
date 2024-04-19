@@ -61,7 +61,11 @@ const AddProperty = () => {
       });
     }
   };
+
+
   return (
+    <>
+    {web3 && propertyManagementContract &&
     <Box maxW="800px" mx="auto" p="4">
       <Box mb="4">
         <Heading size="lg" mb="2">
@@ -117,7 +121,8 @@ const AddProperty = () => {
 
       </Box>
 
-    </Box>
+    </Box>}
+    </>
   )
 }
 
