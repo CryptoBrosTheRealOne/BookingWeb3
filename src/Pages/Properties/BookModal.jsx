@@ -14,7 +14,7 @@ export const getDateRange = (startDate, endDate) => {
     return dates;
 };
 
-const BookModal = ({ isOpen, onClose, bookHandler, bookedPeriods }) => {
+const BookModal = ({ isOpen, onClose, bookHandler, bookedPeriods, estimateHandler }) => {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [periods, setPeriods] = useState([])
@@ -46,6 +46,16 @@ const BookModal = ({ isOpen, onClose, bookHandler, bookedPeriods }) => {
         setEndDate(null)
     }
 
+    const estimateCostHandler = async () => {
+        let start = Math.floor(startDate.getTime() / 1000);
+        let end = start;
+        if (endDate != null) {
+            end = Math.floor(endDate.getTime() / 1000);
+        }
+
+        await estimateHandler(start, end)
+    }
+
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
@@ -71,6 +81,7 @@ const BookModal = ({ isOpen, onClose, bookHandler, bookedPeriods }) => {
                     <Button colorScheme='blue' mr={3} onClick={clickHandler}>
                         Book
                     </Button>
+                    <Button ml={2} onClick={estimateCostHandler}>Cost Estimation</Button>
                     <Button variant='ghost' onClick={onClose}>Close</Button>
                 </ModalFooter>
             </ModalContent>
