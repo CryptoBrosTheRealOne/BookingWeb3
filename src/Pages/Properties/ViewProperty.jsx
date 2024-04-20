@@ -1,73 +1,66 @@
-import { Box, Divider, Flex, Heading, useToast, Text, Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import PropertyManagementABI from "./PropertyManagement.json";
-import { useNavigate, useParams } from 'react-router-dom';
-import Web3 from 'web3';
-import env from '../../env';
+import React, { useEffect, useState } from 'react';
+import { Box, Divider, Flex, Heading, Text, Button, useToast, useDisclosure } from '@chakra-ui/react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useWeb3 } from '../../hooks/useWeb3'; // custom hook for Web3 interaction
 import InteractiveMap from '../../Components/Map/Map';
-import PropertyReservationABI from './PropertyReservation.json';
-
 import BookModal from './BookModal';
+import { loadPropertyDetails, subscribeToReservationCreated, unsubscribeAll } from './service/propertyService'; // External service functions
 
 const ViewProperty = () => {
-    let { id } = useParams();
-    const [web3, setWeb3] = useState(null);
-    const [propertyManagementContract, setPropertyManagementContract] =
-        useState(null);
-    const [propertyReservationContract, setPropertyReservationContract] =
-        useState(null);
-    const [property, setProperty] = useState([]);
-    const [coords, setCoords] = useState({})
-    const toast = useToast();
+    const { id } = useParams();
     const navigate = useNavigate();
-    const [accounts, setAccounts] = useState([]);
-    const { isOpen, onOpen, onClose } = useDisclosure()
+    const { web3, accounts, contracts } = useWeb3(); // Using a custom hook to handle web3 initialization
+    const { propertyManagementContract, propertyReservationContract } = contracts;
+    const [property, setProperty] = useState(null);
+    const [coords, setCoords] = useState({});
+    const toast = useToast();
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const [isShown, setIsShown] = useState();
 
     useEffect(() => {
-        if (window.ethereum) {
-            const web3Instance = new Web3(window.ethereum);
-            setWeb3(web3Instance);
-
-            const propertyContract = new web3Instance.eth.Contract(
-                PropertyManagementABI,
-                env.contractAddress
-            );
-            setPropertyManagementContract(propertyContract);
-            const reservationContract = new web3Instance.eth.Contract(
-                PropertyReservationABI,
-                env.reservationAddress
-            );
-            setPropertyReservationContract(reservationContract);
-            const loadAccounts = async () => {
-                const acc = await web3Instance.eth.getAccounts();
-                setAccounts(acc);
-            };
-            loadAccounts();
-        }
-    }, []);
-
-    useEffect(() => {
-        if (web3 && propertyManagementContract) {
+        if (propertyManagementContract) {
             loadProperty();
         }
-    }, [web3, propertyManagementContract])
+
+        const unsubscribe = subscribeToReservationCreated(propertyReservationContract, handleNewReservation);
+    }, [propertyManagementContract, propertyReservationContract]);
 
     const loadProperty = async () => {
         try {
-            const accounts = await web3.eth.getAccounts();
-            if (accounts.length === 0) {
-                console.error("No accounts found.");
-                return;
-            }
-
-            let x = await propertyManagementContract.methods
-                .getProperty(id).call()
-            setProperty(x)
-            setCoords({ lat: parseFloat(parseInt(x.latitude.toString()) / 100000), lng: parseFloat(parseInt(x.longitude.toString()) / 100000) })
-            console.log(x)
+            const propertyDetails = await loadPropertyDetails(propertyManagementContract, id);
+            setProperty(propertyDetails);
+            setCoords({
+                lat: parseFloat(propertyDetails.latitude) / 100000,
+                lng: parseFloat(propertyDetails.longitude) / 100000
+            });
         } catch (error) {
-            console.error("Error removing property:", error);
+            console.error("Error loading property:", error);
+            toast({
+                title: "Error",
+                description: "Failed to load property details.",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
         }
+    };
+
+    const handleNewReservation = () => {
+        if(!isShown){
+            toast({
+                title: "Booking Confirmed",
+                description: "Your booking has been confirmed.",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+            });
+            setTimeout(() => {
+                setIsShown(false)
+            },5000)
+        }
+        
+        loadProperty();
+        onClose();
     };
 
     const bookProperty = async (startDate, endDate) => {
@@ -96,42 +89,31 @@ const ViewProperty = () => {
                     .reserveProperty(id, startDate, endDate)
                     .send({ from: accounts[0] });
 
-                toast({
-                    title: "Success",
-                    description: "Booked successfully, with transaction hash: " + receipt.transactionHash,
-                    status: "success",
-                    duration: 5000,
-                    isClosable: true,
-                });
-                loadProperty()
-                onClose()
-            });
-
-
+            })
         } catch (error) {
-            console.error("Error reserving property:", error);
+            console.error("Error booking property:", error);
             toast({
-                title: "Error",
-                description: "Failed to book property: " + error.message,
+                title: "Booking Failed",
+                description: `Failed to book property: ${error.message}`,
                 status: "error",
                 duration: 5000,
                 isClosable: true,
             });
         }
-    }
+    };
 
     return (
         <Box maxW="800px" mx="auto" p="4">
             <Flex flexDir={"row"} justifyContent={"space-between"}>
-                <Heading mb="4">View - {property.name}</Heading>
+                <Heading mb="4">View - {property?.name}</Heading>
                 <Button onClick={onOpen}>Book</Button>
             </Flex>
             <Divider mb="4" />
-            <Text>{property.description}</Text>
+            <Text>{property?.description}</Text>
             {coords.lat && <InteractiveMap coords={coords} />}
-            <BookModal isOpen={isOpen} onClose={onClose} bookedPeriods={property.bookedPeriods} bookHandler={bookProperty}></BookModal>
+            <BookModal isOpen={isOpen} onClose={onClose} bookedPeriods={property?.bookedPeriods} bookHandler={bookProperty}></BookModal>
         </Box>
-    )
-}
+    );
+};
 
-export default ViewProperty
+export default ViewProperty;

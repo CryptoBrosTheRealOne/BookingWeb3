@@ -10,33 +10,47 @@ import {
   useToast,
   Flex,
 } from "@chakra-ui/react";
-import Web3 from "web3";
-import PropertyManagementABI from "./PropertyManagement.json";
 import { useNavigate } from "react-router-dom";
-import env from "../../env";
+import { useWeb3 } from "../../hooks/useWeb3";
+import {
+  subscribeToPropertyCreated,
+  subscribeToPropertyRemoved,
+  subscribeToReservationCreated,
+  unsubscribeAll,
+} from "./service/propertyService";
 
 const PropertyManagementComponent = () => {
-  const [web3, setWeb3] = useState(null);
-  const [propertyManagementContract, setPropertyManagementContract] =
-    useState(null);
+  const { web3, accounts, contracts } = useWeb3(); // Using a custom hook to handle web3 initialization
+  const { propertyManagementContract, propertyReservationContract } = contracts;
+
   const [properties, setProperties] = useState([]);
   const toast = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (window.ethereum) {
-      const web3Instance = new Web3(window.ethereum);
-      setWeb3(web3Instance);
+    if (contracts.propertyManagementContract) {
+      if (propertyManagementContract) {
+        loadProperties(propertyManagementContract);
+      }
 
-      const propertyContract = new web3Instance.eth.Contract(
-        PropertyManagementABI,
-        env.contractAddress
+      const unsubscribe = subscribeToPropertyRemoved(
+        propertyManagementContract,
+        handleRemove
       );
-      setPropertyManagementContract(propertyContract);
-
-      loadProperties(propertyContract);
     }
-  }, []);
+  }, [contracts.propertyManagementContract]);
+
+  const handleRemove = () => {
+    toast({
+      title: "Property Removed",
+      description: "Property removed successfully",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
+
+    loadProperties(propertyManagementContract);
+  };
 
   const loadProperties = async (propertyContract) => {
     const propertiesCount = await propertyContract.methods
@@ -62,17 +76,6 @@ const PropertyManagementComponent = () => {
       await propertyManagementContract.methods
         .removeProperty(propertyId)
         .send({ from: fromAddress });
-
-      toast({
-        title: "Property Removed",
-        description: "Property removed successfully",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-
-      // Refresh properties
-      loadProperties(propertyManagementContract);
     } catch (error) {
       console.error("Error removing property:", error);
       toast({
@@ -106,7 +109,7 @@ const PropertyManagementComponent = () => {
               boxShadow="0 0 8px rgba(0, 0, 0, 0.1)"
               transition="border-color 0.2s"
               _hover={{
-                borderColor:"green.500",
+                borderColor: "green.500",
               }}
             >
               <Heading size="sm" mb="2">
