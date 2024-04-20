@@ -1,35 +1,27 @@
 import React, { useState, useEffect } from "react";
 import Web3 from "web3";
-import PropertyManagementComponent from "./Components/PropertyManagementComponent";
-import PropertyReservationComponent from "./Components/PropertyReservationComponent";
+import PropertyManagementComponent from "./Pages/Properties/PropertyManagementComponent";
 import Navigation from "./Components/NavigationBar";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
-import HomePage from "./Components/HomePage";
-import UserProfile from "./Components/ProfileComponent";
+import HomePage from "./Pages/Home/HomePage";
+import UserProfile from "./Pages/Profile/ProfileComponent";
+import AddProperty from "./Pages/Properties/AddProperty";
+import ViewProperty from "./Pages/Properties/ViewProperty";
 function App() {
-
   return (
     <ChakraProvider>
       <BrowserRouter>
         <Navigation />
         <Routes>
-        <Route
-            path="/"
-            element={<HomePage />}
-          />
+          <Route path="/" element={<HomePage />} />
           <Route
             path="/propertyManage"
             element={<PropertyManagementComponent />}
           />
-          <Route
-            path="/bookProperty"
-            element={<PropertyReservationComponent />}
-          />
-          <Route
-            path="/profile"
-            element={<UserProfile />}
-          />
+          <Route path="/addProperty" element={<AddProperty />} />
+          <Route path="/viewProperty/:id" element={<ViewProperty />} />
+          <Route path="/profile" element={<UserProfile />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>

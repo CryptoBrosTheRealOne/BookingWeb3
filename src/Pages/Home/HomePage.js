@@ -10,9 +10,10 @@ const HomePage = () => {
       bgImage={`url(${backgroundImageUrl})`}
       bgSize="cover"
       bgPosition="center"
-      h="100vh"
+      h="95vh"
       position="relative"
       textAlign="center"
+      overflow={"hidden"}
     >
       <Box
         position="absolute"
