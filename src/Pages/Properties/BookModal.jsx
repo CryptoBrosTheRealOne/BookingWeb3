@@ -4,18 +4,28 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import './date.css';
 
+export const getDateRange = (startDate, endDate) => {
+    const dates = [];
+    let currentDate = startDate;
+    while (currentDate <= endDate) {
+        dates.push(new Date(currentDate));
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return dates;
+};
+
 const BookModal = ({ isOpen, onClose, bookHandler, bookedPeriods }) => {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [periods, setPeriods] = useState([])
 
     useEffect(() => {
-        if(bookedPeriods){
+        if (bookedPeriods) {
             setPeriods(bookedPeriods.flatMap(period =>
                 getDateRange(new Date(parseInt(period.startDate.toString()) * 1000), new Date(parseInt(period.endDate.toString()) * 1000))
             ))
         }
-    },[bookedPeriods])
+    }, [bookedPeriods])
 
     const handleDateChange = (dates) => {
         const [start, end] = dates;
@@ -23,19 +33,14 @@ const BookModal = ({ isOpen, onClose, bookHandler, bookedPeriods }) => {
         setEndDate(end);
     };
 
-    const getDateRange = (startDate, endDate) => {
-        const dates = [];
-        let currentDate = startDate;
-        while (currentDate <= endDate) {
-            dates.push(new Date(currentDate));
-            currentDate.setDate(currentDate.getDate() + 1);
-        }
-        return dates;
-    };
-
+    
     const clickHandler = async () => {
         let start = Math.floor(startDate.getTime() / 1000);
-        let end = Math.floor(endDate.getTime() / 1000);
+        let end = start;
+        if (endDate != null) {
+            end = Math.floor(endDate.getTime() / 1000);
+        }
+
         await bookHandler(start, end)
         setStartDate(null)
         setEndDate(null)

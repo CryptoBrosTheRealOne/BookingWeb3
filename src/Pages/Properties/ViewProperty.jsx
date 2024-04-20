@@ -23,7 +23,6 @@ const ViewProperty = () => {
     const [accounts, setAccounts] = useState([]);
     const { isOpen, onOpen, onClose } = useDisclosure()
 
-    
     useEffect(() => {
         if (window.ethereum) {
             const web3Instance = new Web3(window.ethereum);
@@ -75,21 +74,41 @@ const ViewProperty = () => {
         if (!propertyReservationContract || accounts.length === 0) {
             console.error("Contract not loaded or no accounts available");
             return;
-          }
-          try {
-            await propertyReservationContract.methods
-              .reserveProperty(id, startDate, endDate)
-              .send({ from: accounts[0] });
-            toast({
-                title: "Success",
-                description: "Booked successfully",
-                status: "success",
-                duration: 5000,
-                isClosable: true,
-              });
-            loadProperty()
-            onClose()
-          } catch (error) {
+        }
+        try {
+            let totalDays = Math.floor((endDate - startDate) / (60 * 60 * 24)) + 1;
+            let totalPrice = totalDays * parseInt(property.pricePerNight.toString());
+            const latestBlock = await web3.eth.getBlock('latest');
+
+            const baseFee = parseInt(latestBlock.baseFeePerGas);
+            const maxPriorityFeePerGas = web3.utils.toWei('2', 'gwei');  // Suggested tip to miner
+            const maxFeePerGas = web3.utils.toWei((baseFee * 1.2 + parseInt(maxPriorityFeePerGas)).toString(), 'wei');
+
+            web3.eth.sendTransaction({
+                from: accounts[0],
+                to: property.owner,
+                value: totalPrice.toString(),
+                gas: 21000, 
+                maxFeePerGas: maxFeePerGas,
+                maxPriorityFeePerGas: maxPriorityFeePerGas
+            }).then(async (receipt) => {
+                await propertyReservationContract.methods
+                    .reserveProperty(id, startDate, endDate)
+                    .send({ from: accounts[0] });
+
+                toast({
+                    title: "Success",
+                    description: "Booked successfully, with transaction hash: " + receipt.transactionHash,
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true,
+                });
+                loadProperty()
+                onClose()
+            });
+
+
+        } catch (error) {
             console.error("Error reserving property:", error);
             toast({
                 title: "Error",
@@ -97,8 +116,8 @@ const ViewProperty = () => {
                 status: "error",
                 duration: 5000,
                 isClosable: true,
-              });
-          }
+            });
+        }
     }
 
     return (

@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Web3 from "web3";
 import PropertyManagementComponent from "./Pages/Properties/PropertyManagementComponent";
-import PropertyReservationComponent from "./Components/PropertyReservationComponent";
 import Navigation from "./Components/NavigationBar";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import HomePage from "./Pages/Home/HomePage";
-import UserProfile from "./Components/ProfileComponent";
+import UserProfile from "./Pages/Profile/ProfileComponent";
 import AddProperty from "./Pages/Properties/AddProperty";
 import ViewProperty from "./Pages/Properties/ViewProperty";
 function App() {
@@ -22,10 +21,6 @@ function App() {
           />
           <Route path="/addProperty" element={<AddProperty />} />
           <Route path="/viewProperty/:id" element={<ViewProperty />} />
-          <Route
-            path="/bookProperty"
-            element={<PropertyReservationComponent />}
-          />
           <Route path="/profile" element={<UserProfile />} />
         </Routes>
       </BrowserRouter>

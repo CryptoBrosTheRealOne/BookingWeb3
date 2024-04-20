@@ -1,4 +1,4 @@
 export default {
-  contractAddress: "0x76617484e9c197C229480c78226CA282034DB073",
-  reservationAddress: "0x4304e8D57FC66B3eDE1FB9778Cbb4dd16fb49bF2",
+  contractAddress: "0xA0B8dA9EA234f7c4ff3aafDCFC750E9C40F605Db",
+  reservationAddress: "0xA237Bf6c46404590D5b8EC1ADa8959212097Baa1",
 };
