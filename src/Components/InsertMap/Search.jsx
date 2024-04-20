@@ -28,8 +28,7 @@ const Search = (props) => {
       } else {
         // Add a dragend event listener to the marker
         marker.on("dragend", () => {
-          const markerLatLng = marker.getLatLng(); // Get the marker's coordinates
-          console.log("Marker Coordinates:", markerLatLng);
+          const markerLatLng = marker.getLatLng();
         });
       }
     };

@@ -29,7 +29,6 @@ const InsertMap = ({ changeHandler }) => {
   });
   React.useEffect(() => {
     changeHandler(center);
-    console.log(center)
   }, [center]);
 
   React.useEffect(() => {

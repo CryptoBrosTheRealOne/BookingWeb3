@@ -170,7 +170,6 @@ const ViewProperty = () => {
           const averageBaseFeeBigInt = BigInt(Math.floor(averageBaseFee));
            /* eslint-disable */
           const maxPriorityFeePerGasBigInt = BigInt(maxPriorityFeePerGas);
-            debugger
           const totalCostWei =
             gasEstimateBigInt * averageBaseFeeBigInt +
             maxPriorityFeePerGasBigInt;
