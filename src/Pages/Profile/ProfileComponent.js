@@ -10,12 +10,6 @@ import {
 } from "@chakra-ui/react";
 import { getDateRange } from "../Properties/BookModal";
 import { useWeb3 } from "../../hooks/useWeb3";
-import { useNavigate } from "react-router-dom";
-import {
-  subscribeToReservationCreated,
-  unsubscribeAll,
-} from "../Properties/service/propertyService";
-
 function UserProfiles() {
   const [myBookings, setMyBookings] = useState([]);
   const { web3, accounts, contracts } = useWeb3(); // Using a custom hook to handle web3 initialization
