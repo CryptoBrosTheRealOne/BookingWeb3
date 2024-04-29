@@ -10,12 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { getDateRange } from "../Properties/BookModal";
 import { useWeb3 } from "../../hooks/useWeb3";
-import { useNavigate } from "react-router-dom";
-import {
-  subscribeToReservationCreated,
-  unsubscribeAll,
-} from "../Properties/service/propertyService";
-
+import BookingCard from "../../Components/Booking/BookingCard";
 function UserProfiles() {
   const [myBookings, setMyBookings] = useState([]);
   const { web3, accounts, contracts } = useWeb3(); // Using a custom hook to handle web3 initialization
@@ -28,15 +23,6 @@ function UserProfiles() {
       loadProperties();
     }
   }, [propertyManagementContract]);
-
-
-  function formatDate(date) {
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-
-    return `${day}/${month}/${year}`;
-  }
 
   const loadProperties = async () => {
     const properties = await propertyReservationContract.methods
@@ -61,7 +47,8 @@ function UserProfiles() {
       <Divider mb="4" />
       {myBookings &&
         myBookings.map((property) => (
-          <Box
+          <>
+            {/* <Box
             key={property.id}
             borderWidth="1px"
             borderRadius="lg"
@@ -83,23 +70,19 @@ function UserProfiles() {
                 {formatDate(property.endDate)}
               </div>
               <div>Total price: {property.price.toString()}</div>
-              {/* <Flex w="50%" justifyContent={"space-between"}>
-              <Button
-                mt="3"
-                onClick={() => navigate(`/viewProperty/${property.id}`)}
-              >
-                View Property
-              </Button>
-              <Button
-                colorScheme="red"
-                mt="3"
-                onClick={() => removeProperty(property.id)}
-              >
-                Remove Property
-              </Button>
-            </Flex> */}
             </Box>
-          </Box>
+          </Box> */}
+            <BookingCard
+            key={property.id}
+              property={{
+                imageUrl: "https://bit.ly/2Z4KKcF",
+                imageAlt: "Rear view of modern home with pool",
+                title: property.name,
+                formattedPrice: property.price.toString(),
+                ...property,
+              }}
+            />
+          </>
         ))}
     </Box>
   );

@@ -21,7 +21,7 @@ function App() {
           />
           <Route path="/addProperty" element={<AddProperty />} />
           <Route path="/viewProperty/:id" element={<ViewProperty />} />
-          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/myBookings" element={<UserProfile />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>

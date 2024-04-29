@@ -73,8 +73,8 @@ function Navigation() {
           >
             See accomodations
           </Link>
-          <Link href="/profile" fontSize="md" _hover={{ color: "blue.300" }}>
-            Profile
+          <Link href="/myBookings" fontSize="md" _hover={{ color: "blue.300" }}>
+            My bookings
           </Link>
         </>
       </Stack>

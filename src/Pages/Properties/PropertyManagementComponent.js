@@ -12,12 +12,8 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useWeb3 } from "../../hooks/useWeb3";
-import {
-  subscribeToPropertyCreated,
-  subscribeToPropertyRemoved,
-  subscribeToReservationCreated,
-  unsubscribeAll,
-} from "./service/propertyService";
+import { subscribeToPropertyRemoved } from "./service/propertyService";
+import PropertyCard from "../../Components/Property/PropertyCard";
 
 const PropertyManagementComponent = () => {
   const { web3, accounts, contracts } = useWeb3(); // Using a custom hook to handle web3 initialization
@@ -95,50 +91,20 @@ const PropertyManagementComponent = () => {
         <Button onClick={() => navigate("/addProperty")}>Add property</Button>
       </Flex>
       <Divider mb="4" />
-      <Heading size="md" mb="2">
-        Properties
-      </Heading>
-      <UnorderedList>
-        {properties.map((property) => (
-          <ListItem key={property.id} mb="4">
-            <Box
-              borderWidth="1px"
-              borderRadius="lg"
-              p="4"
-              borderColor={"green.300"}
-              boxShadow="0 0 8px rgba(0, 0, 0, 0.1)"
-              transition="border-color 0.2s"
-              _hover={{
-                borderColor: "green.500",
-              }}
-            >
-              <Heading size="sm" mb="2">
-                Location: {property.name}
-              </Heading>
-              <Divider />
-              <Box mt="2">
-                <div>Description: {property.description}</div>
-                <div>Price per night: {property.pricePerNight}</div>
-                <Flex w="50%" justifyContent={"space-between"}>
-                  <Button
-                    mt="3"
-                    onClick={() => navigate(`/viewProperty/${property.id}`)}
-                  >
-                    View Property
-                  </Button>
-                  <Button
-                    colorScheme="red"
-                    mt="3"
-                    onClick={() => removeProperty(property.id)}
-                  >
-                    Remove Property
-                  </Button>
-                </Flex>
-              </Box>
-            </Box>
-          </ListItem>
-        ))}
-      </UnorderedList>
+      {properties.map((property) => (
+          <PropertyCard
+            key={property.id}
+            property={{
+              ...property,
+              imageUrl: "https://bit.ly/2Z4KKcF",
+              imageAlt: "Rear view of modern home with pool",
+              title: property.name,
+              description: property.description,
+              formattedPrice: property.pricePerNight,
+            }}
+            removeHandler={removeProperty}
+          />
+      ))}
     </Box>
   );
 };
